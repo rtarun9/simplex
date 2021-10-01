@@ -1,7 +1,11 @@
+#include "vec3.h"
+
 #include <iostream>
 
 int main()
 {
+	constexpr int MAX_COLOR = 255;
+
 	int nx = 200;
 	int ny = 100;
 
@@ -10,16 +14,12 @@ int main()
 	{
 		for (int i = 0; i < nx; i++)
 		{
-			float r = float(i) / float(nx);
-			float g = float(j) / float(ny);
-			float b = 0.5;
+			spx::Vec3 color(float(i) / nx, float(j) / ny, 0.6f);
+			color *= (float)MAX_COLOR;
 
-			int ir = int(256 * r);
-			int ig = int(256 * g);
-			int ib = int(256 * b);
-
-			std::cout << ir << " " << ig << " " << ib << '\n';
+			std::cout << color << '\n';
 		}
 	}
+
 	return 0;
 }
