@@ -3,3 +3,4 @@ Simple software - ray tracer make with no third party Api's. Based on Peter Shir
 
 # building
 Use the build.bat file in the bin directory to build + run the executable. The output PPM file will also be in the directory.
+

@@ -47,6 +47,8 @@ namespace spx
 		inline friend Vec3 operator*(const Vec3& a, const Vec3& b);
 		inline friend Vec3 operator/(const Vec3& a, const Vec3& b);
 
+		inline friend float dot(const Vec3& a, const Vec3& b);
+
 		inline friend std::ostream& operator<<(std::ostream& out, const Vec3& vec);
 
 		inline static Vec3 zero();
@@ -57,15 +59,15 @@ namespace spx
 		float z;
 	};
 
-	Vec3::Vec3(): x(0.0f), y(0.0f), z(0.0f)
+	inline Vec3::Vec3(): x(0.0f), y(0.0f), z(0.0f)
 	{
 	}
 
-	Vec3::Vec3(float value): x(value), y(value), z(value)
+	inline Vec3::Vec3(float value): x(value), y(value), z(value)
 	{
 	}
 
-	Vec3::Vec3(float x, float y, float z): x(x), y(y), z(z)
+	inline Vec3::Vec3(float x, float y, float z): x(x), y(y), z(z)
 	{
 	}
 
@@ -214,6 +216,11 @@ namespace spx
 	inline Vec3 operator/(const Vec3& a, const Vec3& b)
 	{
 		return Vec3(a.x / b.x, a.y / b.y, a.z / b.z);
+	}
+
+	inline float dot(const Vec3& a, const Vec3& b)
+	{
+		return (a.x * b.x + a.y * b.y + a.z * b.z);
 	}
 
 	inline std::ostream& operator<<(std::ostream& out, const Vec3& vec)
