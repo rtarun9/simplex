@@ -10,16 +10,17 @@ namespace spx
 	{
 	}
 
-	bool HittableList::hit(const Ray& ray, float& minimumTime, float& maximumTime, HitDetails& hitDetails)
+	bool HittableList::hit(const Ray& ray, float& minimumParameter, float& maximumParameter, HitDetails& hitDetails)
 	{
 		bool hasRayHitObject = false;
+		float closestHitSoFar = maximumParameter;
 
 		for (size_t i  = 0; i < objectCount; i++)
 		{
-			if (hittableObjects[i]->hit(ray, minimumTime, maximumTime, hitDetails))
+			if (hittableObjects[i]->hit(ray, minimumParameter, closestHitSoFar, hitDetails))
 			{
+				closestHitSoFar = hitDetails.parameter;
 				hasRayHitObject = true;
-				break;
 			}
 		}
 

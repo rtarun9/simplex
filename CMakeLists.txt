@@ -7,6 +7,7 @@ set (SOURCE_FILES
 		src/main.cpp
 		src/hittable_list.cpp
 		src/sphere.cpp
+		src/camera.cpp
 )
 
 add_executable(simplex ${SOURCE_FILES})

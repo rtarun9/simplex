@@ -50,6 +50,7 @@ namespace spx
 		inline friend float dot(const Vec3& a, const Vec3& b);
 
 		inline friend std::ostream& operator<<(std::ostream& out, const Vec3& vec);
+		inline friend void display(const Vec3& vec);
 
 		inline static Vec3 zero();
 
@@ -225,8 +226,13 @@ namespace spx
 
 	inline std::ostream& operator<<(std::ostream& out, const Vec3& vec)
 	{
-		out << vec.x << ", " << vec.y << ", " << vec.z;
+		out << (int)vec.x << ", " << (int)vec.y << ", " << (int)vec.z;
 		return out;
+	}
+
+	inline void display(const Vec3& vec)
+	{
+		printf("%d %d %d \n", (int)vec.x, (int)vec.y, (int)vec.z);
 	}
 
 	inline Vec3 Vec3::zero()

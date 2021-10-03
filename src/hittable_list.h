@@ -10,10 +10,10 @@ namespace spx
 	{
 	public:
 		HittableList();
-		// note : cannot use a vector  here since the abstract class has no constructor.
+		// note : cannot use a vector  here since the abstract class has no constructor. To use vector you need a vector of pointers, but leaving that for simplicity.
 		HittableList(HittableObject **objects, size_t objectCount);
 
-		virtual bool hit(const Ray& ray, float& minimumTime, float& maximumTime, HitDetails& hitDetails) override;
+		virtual bool hit(const Ray& ray, float& minimumParameter, float& maximumParameter, HitDetails& hitDetails) override;
 
 	private:
 		HittableObject **hittableObjects;

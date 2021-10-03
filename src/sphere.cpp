@@ -12,7 +12,7 @@ namespace spx
 		center = circleCenter;
 	}
 
-	bool Sphere::hit(const Ray& ray, float& minimumTime, float& maximumTime, HitDetails& hitDetails)
+	bool Sphere::hit(const Ray& ray, float& minimumParameter, float& maximumParameter, HitDetails& hitDetails)
 	{
 		// note : related math
 		// for a point to lie on the sphere, it must satisfy circle equation : (x - cx)^2 * (y - cy)^2 * (z - cz)^ = R^2.
@@ -32,9 +32,9 @@ namespace spx
 		if (determinant > 0.0f)
 		{
 			// first check for the smallest root.
-			float t = (-linear - determinant) / (2.0f * quadratic);
+			float t = (-linear - sqrtf(determinant)) / (2.0f * quadratic);
 
-			if (t > minimumTime && t < maximumTime)
+			if (t > minimumParameter && t < maximumParameter)
 			{
 				hitDetails.parameter = t;
 				hitDetails.ray = ray;
@@ -45,8 +45,8 @@ namespace spx
 			}
 			else
 			{
-				float t = (-linear + determinant) / (2.0f * quadratic);
-				if (t > minimumTime && t < maximumTime)
+				float t = (-linear + sqrtf(determinant)) / (2.0f * quadratic);
+				if (t > minimumParameter && t < maximumParameter)
 				{
 					hitDetails.parameter = t;
 					hitDetails.ray = ray;
