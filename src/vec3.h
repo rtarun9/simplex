@@ -48,6 +48,7 @@ namespace spx
 		inline friend Vec3 operator/(const Vec3& a, const Vec3& b);
 
 		inline friend float dot(const Vec3& a, const Vec3& b);
+		inline friend Vec3 cross(const Vec3& a, const Vec3& b);
 
 		inline friend std::ostream& operator<<(std::ostream& out, const Vec3& vec);
 		inline friend void display(const Vec3& vec);
@@ -222,6 +223,16 @@ namespace spx
 	inline float dot(const Vec3& a, const Vec3& b)
 	{
 		return (a.x * b.x + a.y * b.y + a.z * b.z);
+	}
+
+	inline Vec3 cross(const Vec3& a, const Vec3& b)
+	{
+		Vec3 product;
+		product.x = a.y * b.z - a.z * b.y;
+		product.y = -(a.x * b.z - a.z * b.x);
+		product.z = a.x * b.y - b.x * a.y;
+
+		return product;
 	}
 
 	inline std::ostream& operator<<(std::ostream& out, const Vec3& vec)

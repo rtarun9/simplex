@@ -2,10 +2,11 @@
 
 #include "ray.h"
 
-class Material;
-
 namespace spx
 {
+
+	class Material;
+
 	struct HitDetails
 	{
 		// to locate the point given a ray

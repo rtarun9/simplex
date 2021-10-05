@@ -3,6 +3,7 @@
 #include "ray.h"
 #include "sphere.h"
 #include "camera.h"
+#include "material.h"
 #include "hittable_object.h"
 #include "hittable_list.h"
 
@@ -27,21 +28,24 @@ int main()
 	// The Window dimesions are : w(4), h(2)
 	// using Right handed orientation. Rays are shot from the bottom left with two offsets. First ray short to top left.
 
-	Camera camera(Vec3(0.0f));
+	Camera camera(Vec3(-2, 2, 1), Vec3(0, 0, -1), Vec3(0, 1, 0), 70.0f);
 
 	// setup scene objects.
-	constexpr int OBJECT_COUNT = 2;
+	constexpr int OBJECT_COUNT = 4;
 	HittableObject *objects[OBJECT_COUNT];
-	objects[0] = new Sphere(Vec3(0.0f, 0.0f, -1.0f), 0.5f);
-	objects[1] = new Sphere(Vec3(0.0f, -100.5f, -1.0f), 100.0f);
+	objects[0] = new Sphere(Vec3(0.0f, 0.0f, -1.5f), 0.5f, new LambertianDiffuse(Vec3(1.0f)));
+	objects[1] = new Sphere(Vec3(1.1f, 0.0f, -1.0f), 0.5f, new Metal(Vec3(1.0f, 0.0f, 0.0f)));
+	objects[2] = new Sphere(Vec3(-1.1f, 0.0f, -1.5f), 0.5f, new Metal(Vec3(0.0f, 0.0f, 1.0f), 0.3f));
+
+	objects[3] = new Sphere(Vec3(0.0f, -1000.5f, -1.0f), 1000.0f, new LambertianDiffuse(Vec3(0.5f)));
 
 	HittableList hittableList(objects, OBJECT_COUNT);
 
-	Utils::getInstance().initializeRNG(0.0f, 0.9999f);
+	Utils::getInstance().initializeRNG(0.0f, 0.999999f);
 
 	// send multiple rays and average out the color value to get rid of some of the hard edges.
-	const int SAMPLES = 100;
-	int maximumDepth = 50;
+	const int SAMPLES = 1000;
+	int maximumDepth = 1000;
 
 	const float GAMMA_CORRECTION = 1.0 / 2.2f;
 
@@ -99,17 +103,24 @@ Vec3 getColor(const Ray& ray, HittableList& hittableList, int maximumDepth)
 		//return surfaceNormal;
 
 		// for diffuse materials
-		Vec3 objectHitPoint = ray.getPointAtParameter(hitDetails.parameter);
 
-		// target is a random point inside of a unit sphere on the surface of the hittable object.
-		Vec3 target = objectHitPoint + hitDetails.normal + Utils::getInstance().getRandomPointInUnitSphere();
-		return 0.5f * getColor(Ray(objectHitPoint, target - objectHitPoint), hittableList, maximumDepth - 1);
+		Vec3 attenuation;
+		Ray scattered;
+
+		if (hitDetails.material->scatter(ray, hitDetails, attenuation, scattered))
+		{
+			return attenuation * getColor(scattered, hittableList, maximumDepth - 1);
+		}
 	}
 
 	Vec3 normalizedDirection = ray.getDirection().getNormalized();
 
 	float param = 0.5f * (normalizedDirection.getY() + 1);
 
+	// purple background hue
 	return (1.0f - param) * Vec3(1.0f, 1.0f, 1.0f) + (param) * Vec3(0.7001f, 0.0f, 0.601f);
+
+	// dark grayish background hue
+	//return (1.0f - param) * Vec3(1.0f, 1.0f, 1.0f) * 0.3f + (param) * Vec3(0.01001f, 0.0f, 0.0101f);
 }
 

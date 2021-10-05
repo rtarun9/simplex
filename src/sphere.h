@@ -8,12 +8,15 @@ namespace spx
 	{
 	public:
 		Sphere();
-		Sphere(const Vec3& center, float radius);
+		Sphere(const Vec3& center, float radius, Material *material);
+
+		~Sphere();
 
 		virtual bool hit(const Ray& ray, float& minimumParameter, float& maximumParamter, HitDetails& hitDetails) override;
 
 	private:
 		Vec3 center;
 		float radius;
+		Material *material;
 	};
 }

@@ -2,14 +2,20 @@
 
 namespace spx
 {
-	Sphere::Sphere(): radius(0.5f)
+	Sphere::Sphere(): radius(0.5f), material(nullptr)
 	{
 		center = (Vec3(0.0f, 0.0f, -1.0f));
 	}
 
-	Sphere::Sphere(const Vec3& circleCenter, float radius): radius(radius)
+	Sphere::Sphere(const Vec3& circleCenter, float radius, Material* material): radius(radius), material(material)
 	{
 		center = circleCenter;
+	}
+
+	Sphere::~Sphere()
+	{
+		// currently unable to delete materials due to forward decleration.
+		//delete material;
 	}
 
 	bool Sphere::hit(const Ray& ray, float& minimumParameter, float& maximumParameter, HitDetails& hitDetails)
@@ -39,7 +45,7 @@ namespace spx
 				hitDetails.parameter = t;
 				hitDetails.ray = ray;
 				hitDetails.normal = (ray.getPointAtParameter(t) - center).getNormalized();
-
+				hitDetails.material = material;
 				return true;
 
 			}
@@ -51,6 +57,7 @@ namespace spx
 					hitDetails.parameter = t;
 					hitDetails.ray = ray;
 					hitDetails.normal = (ray.getPointAtParameter(t) - center).getNormalized();
+					hitDetails.material = material;
 					return true;
 				}
 			}
