@@ -34,4 +34,14 @@ namespace spx
 		Vec3 albedo;
 		float fuzziness;
 	};
+
+	class Dielectric : public Material
+	{
+	public:
+		Dielectric(float refractiveIndex);
+		bool scatter(const Ray& ray, const HitDetails& hitDetails, Vec3& attenuation, Ray& scatterdRay);
+
+	private:
+		float refractiveIndex;
+	};
 }

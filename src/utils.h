@@ -17,7 +17,9 @@ namespace spx
 		inline float getRandomFloatInRange();
 
 		inline Vec3 reflect(const Vec3& v, const Vec3& normal);
-		bool refract(const Vec3& v, const Vec3& normal, float thetaM1OverThetaM2, Vec3& refractedVector);
+		inline bool refract(const Vec3& v, const Vec3& normal, float thetaM1OverThetaM2, Vec3& refractedVector);
+
+		inline float schlick(float cos, float refractiveIndex);
 
 		static inline Utils& getInstance();
 
@@ -91,6 +93,15 @@ namespace spx
 			return false;
 		}
 	}
+
+	float Utils::schlick(float cos, float refractiveIndex)
+	{
+		float ro = (1 - refractiveIndex) / (1 + refractiveIndex);
+		ro = ro * ro;
+
+		return ro + (1 - ro) * powf((1 - cos), 5);
+	}
+
 	inline Utils& Utils::getInstance()
 	{
 		static Utils instance;

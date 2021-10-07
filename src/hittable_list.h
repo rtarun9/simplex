@@ -3,6 +3,7 @@
 #include "hittable_object.h"
 
 #include <vector>
+#include <memory>
 
 namespace spx
 {
@@ -18,5 +19,5 @@ namespace spx
 	private:
 		HittableObject **hittableObjects;
 		size_t objectCount;
-	};
+};
 }

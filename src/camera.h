@@ -2,6 +2,7 @@
 
 #include "vec3.h"
 #include "ray.h"
+#include "utils.h"
 
 namespace spx
 {
@@ -19,7 +20,7 @@ namespace spx
 	{
 	public:
 		Camera();
-		Camera(const Vec3& position, const Vec3& lookAt, const Vec3& worldUp, float fov = 45.0f, float aspectRatio = 2);
+		Camera(const Vec3& position, const Vec3& lookAt, const Vec3& worldUp, float fov = 45.0f, float aspectRatio = 2, float aperture = 0.0f, float focusDistance= 0.0f);
 
 		Ray getRay(float u, float v);
 
@@ -31,5 +32,9 @@ namespace spx
 
 		float fov;
 		float  aspectRatio;
+
+		float aperature;
+		float focusDistance;
+		float lensRadius;
 	};
 }

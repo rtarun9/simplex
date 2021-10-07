@@ -19,8 +19,8 @@ int main()
 {
 	constexpr int MAX_COLOR = 255;
 
-	int nx = 200;
-	int ny = 100;
+	int nx = 500;
+	int ny = 250;
 
 	// note : general setup
 	// camera (from where we shoot rays to the 'screen') is at 0, 0, 0.
@@ -28,24 +28,56 @@ int main()
 	// The Window dimesions are : w(4), h(2)
 	// using Right handed orientation. Rays are shot from the bottom left with two offsets. First ray short to top left.
 
-	Camera camera(Vec3(-2, 2, 1), Vec3(0, 0, -1), Vec3(0, 1, 0), 70.0f);
+	Vec3 lookFrom = Vec3(0.0, 2, 5);
+	Vec3 lookAt = Vec3(0.0, -1.0f, -0.0f);
+	float distanceToFocus = 10.0f;
+	float aperture = 0.1;
+
+	Camera camera(lookFrom, lookAt, Vec3(0, 1, 0), 50.0f, 2.0f, aperture, distanceToFocus);
 
 	// setup scene objects.
-	constexpr int OBJECT_COUNT = 4;
+	constexpr int OBJECT_COUNT = 30;
 	HittableObject *objects[OBJECT_COUNT];
-	objects[0] = new Sphere(Vec3(0.0f, 0.0f, -1.5f), 0.5f, new LambertianDiffuse(Vec3(1.0f)));
-	objects[1] = new Sphere(Vec3(1.1f, 0.0f, -1.0f), 0.5f, new Metal(Vec3(1.0f, 0.0f, 0.0f)));
-	objects[2] = new Sphere(Vec3(-1.1f, 0.0f, -1.5f), 0.5f, new Metal(Vec3(0.0f, 0.0f, 1.0f), 0.3f));
+	Vec3 offset = Vec3(0.0f, 0.0f, -1.5f);
 
-	objects[3] = new Sphere(Vec3(0.0f, -1000.5f, -1.0f), 1000.0f, new LambertianDiffuse(Vec3(0.5f)));
+	for (int i = 0; i < OBJECT_COUNT - 1; i++)
+	{
+		Vec3 color = Vec3(Utils::getInstance().getRandomFloatInRange(), Utils::getInstance().getRandomFloatInRange(), Utils::getInstance().getRandomFloatInRange());
+
+		offset += Vec3(1.0f, 0, -1.0);
+
+		if(i > 10)
+			offset += Vec3(0.0f, 0, 2.0);
+
+		if (i % 2 == 0)
+		{
+			objects[i] = new Sphere(offset, 0.5f, new LambertianDiffuse(color));
+		}
+		else
+		{
+			objects[i] = new Sphere(offset, 0.5f, new Metal(color));
+
+			if (i % 3 == 0)
+			{
+				objects[i] = new Sphere(offset, 0.5f, new Dielectric(0.5f));
+			}
+
+			if (i % 5 == 0)
+			{
+				objects[i] = new Sphere(offset, 0.5f, new Dielectric(0.333f));
+			}
+		}
+	}
+
+	objects[OBJECT_COUNT - 1] = new Sphere(Vec3(0.0f, -1000.5f, -1.0f), 1000.0f, new LambertianDiffuse(Vec3(0.3f, 0.1f, 0.1f)));
 
 	HittableList hittableList(objects, OBJECT_COUNT);
 
 	Utils::getInstance().initializeRNG(0.0f, 0.999999f);
 
 	// send multiple rays and average out the color value to get rid of some of the hard edges.
-	const int SAMPLES = 1000;
-	int maximumDepth = 1000;
+	const int SAMPLES = 10;
+	int maximumDepth = 10;
 
 	const float GAMMA_CORRECTION = 1.0 / 2.2f;
 
@@ -69,9 +101,7 @@ int main()
 			color /= SAMPLES;
 			color = Vec3(pow(color.getX(), GAMMA_CORRECTION), pow(color.getY(), GAMMA_CORRECTION), pow(color.getZ(), GAMMA_CORRECTION));
 
-			color *= Vec3(255.99, 255.99, 255.99);
-
-			std::cout << color << '\n';
+			displayColor(color, std::cout);
 		}
 	}
 

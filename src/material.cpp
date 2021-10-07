@@ -37,4 +37,60 @@ namespace spx
 		// for now, always assuming that reflection happens
 		return true;
 	}
+
+	Dielectric::Dielectric(float refractiveIndex): refractiveIndex(refractiveIndex)
+	{
+	}
+
+	bool Dielectric::scatter(const Ray& ray, const HitDetails& hitDetails, Vec3& attenuation, Ray& scatterdRay)
+	{
+		// bit complicated math, need to read it up
+		// good explanation is given here : https://graphics.stanford.edu/courses/cs148-10-summer/docs/2006--degreve--reflection_refraction.pdf
+
+		Vec3 outwardNormal;
+		Vec3  reflected = Utils::getInstance().reflect(ray.getDirection(), hitDetails.normal);
+		float niOverNt;
+		attenuation = Vec3(1.0f);
+
+		Vec3 refracted;
+
+		float reflectProbability;
+		float  cos;
+
+		// if  the ray and  normal and in the same  direction, its technically a inward normal case. to get hte outward  normal, reverse hitDetails.normal.
+		// not sure why the refractive  index is such in this case.
+		if (dot(ray.getDirection(), hitDetails.normal) > 0)
+		{
+			outwardNormal = -1 * hitDetails.normal;
+			niOverNt = refractiveIndex;
+			cos = refractiveIndex * dot(ray.getDirection(), hitDetails.normal) / ray.getDirection().getLength();
+		}
+		else
+		{
+			outwardNormal = hitDetails.normal;
+			niOverNt = 1.0f / refractiveIndex;
+			cos = -1 * dot(ray.getDirection(), hitDetails.normal) / ray.getDirection().getLength();
+		}
+
+		if (Utils::getInstance().refract(ray.getDirection(), outwardNormal, niOverNt, refracted))
+		{
+			reflectProbability = Utils::getInstance().schlick(cos, refractiveIndex);
+		}
+		else
+		{
+			scatterdRay = Ray(ray.getPointAtParameter(hitDetails.parameter), reflected);
+			reflectProbability = 1.0f;
+		}
+
+		if (Utils::getInstance().getRandomFloatInRange() < reflectProbability)
+		{
+			scatterdRay = Ray(ray.getPointAtParameter(hitDetails.parameter), reflected);
+		}
+		else
+		{
+			scatterdRay = Ray(ray.getPointAtParameter(hitDetails.parameter), refracted);
+		}
+
+		return true;
+	}
 }

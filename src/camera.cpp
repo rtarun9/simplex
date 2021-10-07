@@ -7,9 +7,11 @@ namespace spx
 	{
 	}
 
-	Camera::Camera(const Vec3& position, const Vec3& lookAt, const Vec3& worldUp, float fov, float aspect)
-										: aspectRatio(aspect)
+	Camera::Camera(const Vec3& position, const Vec3& lookAt, const Vec3& worldUp, float fov, float aspect, float aperture, float focusDistance)
+										: aspectRatio(aspect), focusDistance(focusDistance), aperature(aperture)
 	{
+		lensRadius = aperature / 2;
+
 		// convert degeree to radians
 		fov = fov * 3.14159 / 180.0f;
 
@@ -26,13 +28,15 @@ namespace spx
 		Vec3 u = (cross(worldUp, w)).normalize();
 		Vec3 v = cross(w, u);
 
-		lowerLeftCorner = origin - widthHalf *  u - heightHalf * v - w;
-		horizontalRange = 2 * widthHalf * u;
-		verticalRange = 2 * heightHalf * v;
+		lowerLeftCorner = origin - widthHalf *  u - heightHalf * v - w * focusDistance;
+		horizontalRange = 2 * widthHalf * u * focusDistance;
+		verticalRange = 2 * heightHalf * v * focusDistance;
 	}
 
 	Ray Camera::getRay(float u, float v)
 	{
-		return Ray(origin, lowerLeftCorner + u * horizontalRange + v * verticalRange - origin);
+		Vec3 random = lensRadius * Utils::getInstance().getRandomPointInUnitSphere();
+		Vec3 offset = u * random.getX() + v *random.getY();
+		return Ray(origin + offset, lowerLeftCorner + u * horizontalRange + v * verticalRange - origin - offset);
 	}
 }

@@ -51,7 +51,7 @@ namespace spx
 		inline friend Vec3 cross(const Vec3& a, const Vec3& b);
 
 		inline friend std::ostream& operator<<(std::ostream& out, const Vec3& vec);
-		inline friend void display(const Vec3& vec);
+		inline friend void displayColor(const Vec3& vec, std::ostream& out);
 
 		inline static Vec3 zero();
 
@@ -237,13 +237,13 @@ namespace spx
 
 	inline std::ostream& operator<<(std::ostream& out, const Vec3& vec)
 	{
-		out << (int)vec.x << ", " << (int)vec.y << ", " << (int)vec.z;
+		out << static_cast<int>(vec.x) << ", " << static_cast<int>(vec.y) << ", " << static_cast<int>(vec.z);
 		return out;
 	}
 
-	inline void display(const Vec3& vec)
+	inline void displayColor(const Vec3& vec, std::ostream& out)
 	{
-		printf("%d %d %d \n", (int)vec.x, (int)vec.y, (int)vec.z);
+		out << static_cast<int>(vec.x * 255.999) << " " << static_cast<int>(vec.y * 255.999) << " " << static_cast<int>(vec.z  * 255.999) << "\n";
 	}
 
 	inline Vec3 Vec3::zero()
