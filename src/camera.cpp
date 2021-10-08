@@ -13,24 +13,22 @@ namespace spx
 		lensRadius = aperature / 2;
 
 		// convert degeree to radians
-		fov = fov * 3.14159 / 180.0f;
-
-		float heightHalf = tanf(fov / 2);
-		float widthHalf = aspectRatio * heightHalf;
-		lowerLeftCorner = Vec3(-widthHalf, -heightHalf, -1.0f);
-		horizontalRange = Vec3(2 * widthHalf, 0.0f, 0.0f);
-		verticalRange = Vec3(0.0f, 2 * heightHalf, 0.0f);
+		float theta = fov * 3.14159 / 180.0f;
+		float heightHalf = tanf(theta / 2);
+		float viewportHeight = 2.0f * heightHalf;
+		float viewportWidth = aspectRatio * viewportHeight;
 
 		origin = position;
 
-		// opposite to what is expected, since z is facing in the screen.
+		//z is opposite to what is expected, since z is facing in the screen.
 		Vec3 w = (position - lookAt).normalize();
 		Vec3 u = (cross(worldUp, w)).normalize();
 		Vec3 v = cross(w, u);
 
-		lowerLeftCorner = origin - widthHalf *  u - heightHalf * v - w * focusDistance;
-		horizontalRange = 2 * widthHalf * u * focusDistance;
-		verticalRange = 2 * heightHalf * v * focusDistance;
+		horizontalRange = (viewportWidth) * u * focusDistance;
+		verticalRange = (viewportHeight) * v * focusDistance;
+
+		lowerLeftCorner = origin - viewportWidth / 2  - viewportHeight / 2 - w * focusDistance;
 	}
 
 	Ray Camera::getRay(float u, float v)

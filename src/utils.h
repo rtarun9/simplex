@@ -77,6 +77,8 @@ namespace spx
 	inline bool Utils::refract(const Vec3& v, const Vec3& normal, float thetaM1OverThetaM2, Vec3& refractedVector)
 	{
 		// no idea about the calculations, putting  understanding of concept or math here
+		// essentially using the property that V = V perp + V paralell, along with snells law.
+		// explanation : https://graphics.stanford.edu/courses/cs148-10-summer/docs/2006--degreve--reflection_refraction.pdf
 		Vec3 uv = v;
 		uv.normalize();
 

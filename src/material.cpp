@@ -10,7 +10,7 @@ namespace spx
 	{
 		Vec3 hitPoint = ray.getPointAtParameter(hitDetails.parameter);
 
-		// target is the random point in unit sphere
+		// target is the random point in unit sphere, centered at randomPoint - Hitpoint
 		Vec3 target = hitPoint + hitDetails.normal + Utils::getInstance().getRandomPointInUnitSphere();
 		scatterdRay = Ray(hitPoint, target - hitPoint);
 		attenuation = albedo;
@@ -46,6 +46,7 @@ namespace spx
 	{
 		// bit complicated math, need to read it up
 		// good explanation is given here : https://graphics.stanford.edu/courses/cs148-10-summer/docs/2006--degreve--reflection_refraction.pdf
+		// the dielectric materiail will randomly either reflect or refract.
 
 		Vec3 outwardNormal;
 		Vec3  reflected = Utils::getInstance().reflect(ray.getDirection(), hitDetails.normal);
@@ -57,14 +58,16 @@ namespace spx
 		float reflectProbability;
 		float  cos;
 
-		// if  the ray and  normal and in the same  direction, its technically a inward normal case. to get hte outward  normal, reverse hitDetails.normal.
-		// not sure why the refractive  index is such in this case.
+		// if the dot product  is greater than 0, the ray's direction and normal is in the same directions.
+		// think of it as the case when  light  is entering a new medium : by default from lower medium to higher (air to glass, etc).
 		if (dot(ray.getDirection(), hitDetails.normal) > 0)
 		{
 			outwardNormal = -1 * hitDetails.normal;
 			niOverNt = refractiveIndex;
 			cos = refractiveIndex * dot(ray.getDirection(), hitDetails.normal) / ray.getDirection().getLength();
 		}
+
+		// else, the ray is going from a higher refractive index to a  medium of lower  refractive index. (the ray is going from inside of dieletric objectt to the outside environment.)
 		else
 		{
 			outwardNormal = hitDetails.normal;

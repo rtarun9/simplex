@@ -20,7 +20,8 @@ namespace spx
 		bool scatter(const Ray& ray, const HitDetails& hitDetails, Vec3& attenuation, Ray& scatterdRay);
 
 	private:
-		// color of the sphere, but not exactly either (since also used as attenuation)
+		// lambertian diffuse doesnt not have any color : merely just directs ray in random direction.
+		// the color vislble is just the color of  re direction ray * its attenutation.
 		Vec3 albedo;
 	};
 
@@ -31,6 +32,7 @@ namespace spx
 		bool scatter(const Ray& ray, const HitDetails& hitDetails, Vec3& attenuation, Ray& scatterdRay);
 
 	private:
+		// perfect reflection happens in the metal.
 		Vec3 albedo;
 		float fuzziness;
 	};

@@ -17,59 +17,60 @@ Vec3 getColor(const Ray& ray, HittableList& hittableList, int maximumDepth);
 
 int main()
 {
+	// note : general setup
+	// using Right handed orientation. Rays are shot from the bottom left with two offsets. First ray short to top left.
+
 	constexpr int MAX_COLOR = 255;
 
 	int nx = 500;
 	int ny = 250;
 
-	// note : general setup
-	// camera (from where we shoot rays to the 'screen') is at 0, 0, 0.
-	// window aspect ratio : 2 : 1.
-	// The Window dimesions are : w(4), h(2)
-	// using Right handed orientation. Rays are shot from the bottom left with two offsets. First ray short to top left.
+	// setup camera
+	Vec3 lookFrom = Vec3(0.0, 10.0, 10.0);
+	Vec3 lookAt = Vec3(0, 0.0f, 0.0f);
+	float distanceToFocus = 10.5f;
+	float aperture = 0.6f;
 
-	Vec3 lookFrom = Vec3(0.0, 2, 5);
-	Vec3 lookAt = Vec3(0.0, -1.0f, -0.0f);
-	float distanceToFocus = 10.0f;
-	float aperture = 0.1;
+	float aspectRatio = static_cast<float>(nx) / ny;
 
-	Camera camera(lookFrom, lookAt, Vec3(0, 1, 0), 50.0f, 2.0f, aperture, distanceToFocus);
+	Camera camera(lookFrom, lookAt, Vec3(0, 1, 0), 20.0f, aspectRatio, aperture, distanceToFocus);
 
 	// setup scene objects.
-	constexpr int OBJECT_COUNT = 30;
-	HittableObject *objects[OBJECT_COUNT];
-	Vec3 offset = Vec3(0.0f, 0.0f, -1.5f);
+	// used code from RTOW to get a bunch of random sphere's and test out the efficiency of  the code.
 
-	for (int i = 0; i < OBJECT_COUNT - 1; i++)
+	const int OBJECT_COUNT = 484;
+	HittableObject *objects[OBJECT_COUNT + 1];
+
+	objects[0] = new Sphere(Vec3(0, -1000, 0), 1000, new LambertianDiffuse(Vec3(0.5f)));
+	int i = 1;
+
+	for (int a = -11; a < 11; a++)
 	{
-		Vec3 color = Vec3(Utils::getInstance().getRandomFloatInRange(), Utils::getInstance().getRandomFloatInRange(), Utils::getInstance().getRandomFloatInRange());
-
-		offset += Vec3(1.0f, 0, -1.0);
-
-		if(i > 10)
-			offset += Vec3(0.0f, 0, 2.0);
-
-		if (i % 2 == 0)
+		for (int b = -11; b < 11; b++)
 		{
-			objects[i] = new Sphere(offset, 0.5f, new LambertianDiffuse(color));
-		}
-		else
-		{
-			objects[i] = new Sphere(offset, 0.5f, new Metal(color));
-
-			if (i % 3 == 0)
+			float chooseMaterial = Utils::getInstance().getRandomFloatInRange();
+			Vec3 center = Vec3(a + 0.9 * Utils::getInstance().getRandomFloatInRange(), 0.2f, b + 0.9 * Utils::getInstance().getRandomFloatInRange());
+			if ((center - Vec3(4, 0.2, 0)).getLength() > 0.9)
 			{
-				objects[i] = new Sphere(offset, 0.5f, new Dielectric(0.5f));
-			}
-
-			if (i % 5 == 0)
-			{
-				objects[i] = new Sphere(offset, 0.5f, new Dielectric(0.333f));
+				if (chooseMaterial < 0.8)
+				{
+					objects[i++] = new Sphere(center, 0.2f, new LambertianDiffuse(Vec3(Utils::getInstance().getRandomFloatInRange() * Utils::getInstance().getRandomFloatInRange(), Utils::getInstance().getRandomFloatInRange() * Utils::getInstance().getRandomFloatInRange(),  Utils::getInstance().getRandomFloatInRange() * Utils::getInstance().getRandomFloatInRange())));
+				}
+				else if (chooseMaterial < 0.95)
+				{
+					objects[i++] = new Sphere(center, 0.2f, new Metal(Vec3(0.5f * (1 + Utils::getInstance().getRandomFloatInRange()), 0.5f * (1 + Utils::getInstance().getRandomFloatInRange()), 0.5f * (1 + Utils::getInstance().getRandomFloatInRange()))));
+				}
+				else
+				{
+					objects[i++] = new Sphere(center, 0.2f, new Dielectric(1.33f));
+				}
 			}
 		}
 	}
 
-	objects[OBJECT_COUNT - 1] = new Sphere(Vec3(0.0f, -1000.5f, -1.0f), 1000.0f, new LambertianDiffuse(Vec3(0.3f, 0.1f, 0.1f)));
+	objects[i++] = new Sphere(Vec3(0.0f, 1.0f, 0.0f), 1.0f, new Dielectric(1.5f));
+	objects[i++] = new Sphere(Vec3(-4, 1, 0), 1.0f, new LambertianDiffuse(Vec3(0.4f, 0.f, 0.1f)));
+	objects[i++] = new Sphere(Vec3(4, 1, 0), 1.0f, new Metal(Vec3(0.7f, 0.6f, 0.5f), 0.1f));
 
 	HittableList hittableList(objects, OBJECT_COUNT);
 
@@ -83,6 +84,7 @@ int main()
 
 	std::cout << "P3\n" << nx << " " << ny << "\n" << MAX_COLOR << '\n';
 
+	// main 'render loop'
 	for (int j = ny - 1; j >= 0; j--)
 	{
 		std::cerr << "\rLines Remaining : " << j << ' ' << std::flush;
@@ -106,6 +108,7 @@ int main()
 	}
 
 	std::cerr << "\nCompleted." << std::flush;
+
 	for (auto object : objects)
 	{
 		delete object;
@@ -128,12 +131,6 @@ Vec3 getColor(const Ray& ray, HittableList& hittableList, int maximumDepth)
 			return Vec3(0.0f);
 		}
 
-		// change range of each component to [0, 1]. componenets can be -ve if the sufaceNormal points into the screen (-z direction)
-		//Vec3 surfaceNormal = 0.5f * (hitDetails.normal.getNormalized() + Vec3(1.0f));
-		//return surfaceNormal;
-
-		// for diffuse materials
-
 		Vec3 attenuation;
 		Ray scattered;
 
@@ -143,14 +140,10 @@ Vec3 getColor(const Ray& ray, HittableList& hittableList, int maximumDepth)
 		}
 	}
 
+	// setup for background color
 	Vec3 normalizedDirection = ray.getDirection().getNormalized();
 
 	float param = 0.5f * (normalizedDirection.getY() + 1);
-
-	// purple background hue
-	return (1.0f - param) * Vec3(1.0f, 1.0f, 1.0f) + (param) * Vec3(0.7001f, 0.0f, 0.601f);
-
-	// dark grayish background hue
-	//return (1.0f - param) * Vec3(1.0f, 1.0f, 1.0f) * 0.3f + (param) * Vec3(0.01001f, 0.0f, 0.0101f);
+	return (1.0f - param) * Vec3(1.0f) + (param) * Vec3(0.5f, 0.7f, 1.0f);
 }
 
